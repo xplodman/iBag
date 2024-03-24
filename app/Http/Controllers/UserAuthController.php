@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Notifications\VerifyEmail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -20,8 +21,12 @@ class UserAuthController extends Controller
             'email' => $registerUserData['email'],
             'password' => Hash::make($registerUserData['password']),
         ]);
-
         $token = $user->createToken($user->name.'-AuthToken')->plainTextToken;
+
+        $otp = random_int(100000, 999999);
+        $user->otp = $otp;
+        $user->notify(new VerifyEmail($otp));
+
         return response()->json([
             'access_token' => $token,
         ]);
@@ -76,5 +81,42 @@ class UserAuthController extends Controller
             'message' => 'User updated successfully',
             'user' => $user
         ]);
+    }
+
+    public function verifyEmail(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        if ($request->otp === $user->otp) {
+            $user->email_verified_at = now();
+            $user->otp = null; // Clear OTP after verification
+            $user->save();
+
+            return response()->json(['message' => 'Email verified successfully']);
+        }
+
+        return response()->json(['message' => 'Invalid OTP'], 400);
+    }
+
+    public function resendVerificationEmail(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $otp = random_int(100000, 999999);
+        $user->otp = $otp;
+        $user->save();
+
+        // Send email with OTP
+        $user->notify(new VerifyEmail($otp));
+
+        return response()->json(['message' => 'Verification email resent successfully'], 200);
     }
 }
