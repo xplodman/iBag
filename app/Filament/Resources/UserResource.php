@@ -7,6 +7,7 @@ use App\Models\User;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -44,6 +45,7 @@ class UserResource extends Resource
                                     ->dehydrated(fn($state) => filled($state))
                                     ->required(fn(string $context): bool => $context === 'create'),
                            Select::make('roles')->multiple()->relationship('roles', 'name'),
+                           SpatieMediaLibraryFileUpload::make('profile_image')
                        ]),
 
             ]);
@@ -62,6 +64,8 @@ class UserResource extends Resource
                 TextColumn::make('email'),
                 TextColumn::make('created_at')->dateTime(),
                 TextColumn::make('roles.name')->listWithLineBreaks(),
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('profile_image')
+                                                            ->toggleable(),
             ])
             ->filters([
                 Filter::make('email_verified_at')->label('Email verified')->query(function (Builder $query): Builder {

@@ -14,13 +14,22 @@ class UserAuthController extends Controller
         $registerUserData = $request->validate([
             'name'=>'required|string',
             'email'=>'required|string|email|unique:users',
-            'password'=>'required|min:8'
+            'password'=>'required|min:8',
+            'profile_image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+
         $user = User::create([
             'name' => $registerUserData['name'],
             'email' => $registerUserData['email'],
             'password' => Hash::make($registerUserData['password']),
         ]);
+
+        // Handle profile photo upload
+        if ($request->hasFile('profile_image')) {
+            $user->addMedia($request->file('profile_image'))->toMediaCollection();
+        }
+
         $token = $user->createToken($user->name.'-AuthToken')->plainTextToken;
 
         $otp = random_int(100000, 999999);
@@ -71,9 +80,16 @@ class UserAuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-
         $user = auth()->user();
+
+        // Handle profile photo upload
+        if ($request->hasFile('profile_image')) {
+            $user->clearMediaCollection();
+            $user->addMedia($request->file('profile_image'))->toMediaCollection();
+        }
+
         $user->name = $request->input('name');
         $user->save();
 
