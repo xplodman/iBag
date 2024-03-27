@@ -9,6 +9,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -24,8 +25,6 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationGroup = 'Settings';
-
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
     protected static ?int $navigationSort = 1;
@@ -39,13 +38,16 @@ class UserResource extends Resource
                        ->schema([
                            TextInput::make('name'),
                            TextInput::make('email')->email(),
+                           TextInput::make('mobile'),
+                           TextInput::make('address'),
                            TextInput::make('password')
                                     ->password()
                                     ->dehydrateStateUsing(fn($state) => Hash::make($state))
                                     ->dehydrated(fn($state) => filled($state))
                                     ->required(fn(string $context): bool => $context === 'create'),
                            Select::make('roles')->multiple()->relationship('roles', 'name'),
-                           SpatieMediaLibraryFileUpload::make('profile_image')
+                           SpatieMediaLibraryFileUpload::make('profile_image'),
+                           Toggle::make('is_provider'),
                        ]),
 
             ]);
@@ -62,10 +64,12 @@ class UserResource extends Resource
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('email'),
+                TextColumn::make('mobile'),
+                TextColumn::make('address'),
                 TextColumn::make('created_at')->dateTime(),
                 TextColumn::make('roles.name')->listWithLineBreaks(),
-                Tables\Columns\SpatieMediaLibraryImageColumn::make('profile_image')
-                                                            ->toggleable(),
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('profile_image')->toggleable(),
+                Tables\Columns\IconColumn::make('is_provider')->boolean(),
             ])
             ->filters([
                 Filter::make('email_verified_at')->label('Email verified')->query(function (Builder $query): Builder {

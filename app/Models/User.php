@@ -7,6 +7,7 @@ use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -44,6 +45,9 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
         'provider',
         'provider_id',
         'otp',
+        'is_provider',
+        'mobile',
+        'address',
     ];
 
     /**
@@ -74,7 +78,9 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
      */
     protected $appends = [
         'profile_photo_url',
-        'profile_image'
+        'profile_image',
+        'total_orders_points',
+        'total_order_items_kg',
     ];
 
     public function canAccessPanel(Panel $panel): bool
@@ -96,6 +102,27 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
             $mediaItems = $this->getMedia();
 
             return isset($mediaItems[0]) ? $mediaItems[0]->getFullUrl() : '';
+        });
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function totalOrdersPoints(): Attribute
+    {
+        return Attribute::get(function () {
+            return (int) $this->orders()->where('confirmed', true)->sum('points');
+        });
+    }
+
+    public function totalOrderItemsKg(): Attribute
+    {
+        return Attribute::get(function () {
+            return (int) $this->orders()->where('confirmed', true)->with('orderCategories')->get()->sum(function ($order) {
+                return $order->orderCategories->sum('estimated_kg');
+            });
         });
     }
 }

@@ -5,18 +5,27 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Article extends Model implements HasMedia
+class Category extends Model implements HasMedia
 {
-    use HasFactory;
     use InteractsWithMedia;
-    use SoftDeletes;
-    protected $fillable = ['user_id', 'title', 'description'];
+
+    public static array $allowedFilters = [
+        'donation_category'
+    ];
+
+    protected $fillable = [
+        'name',
+        'donation_category',
+    ];
+
+    protected $casts = [
+        'donation_category' => 'boolean',
+    ];
 
     /**
      * The accessors to append to the model's array form.
@@ -27,10 +36,11 @@ class Article extends Model implements HasMedia
         'image',
     ];
 
-    public function user()
+    public function donations()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsToMany(Donation::class);
     }
+
     public function registerMediaConversions(Media $media = null): void
     {
         $this
