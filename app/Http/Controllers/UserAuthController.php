@@ -34,6 +34,7 @@ class UserAuthController extends Controller
 
         $otp = random_int(100000, 999999);
         $user->otp = $otp;
+        $user->save();
         $user->notify(new VerifyEmail($otp));
 
         return response()->json([
