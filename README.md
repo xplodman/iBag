@@ -6,7 +6,7 @@ Explore the design of iBag on Figma: [Figma Link](https://www.figma.com/file/c6s
 1. **Clone the Repository:**
 
    ```bash
-   `git clone https://github.com/xplodman/iBag`
+   git clone https://github.com/xplodman/iBag
    ```
 
 2. **Navigate to the Project Directory:**
