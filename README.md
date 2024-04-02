@@ -4,37 +4,50 @@ Explore the design of iBag on Figma: [Figma Link](https://www.figma.com/file/c6s
 ## Cloning a Laravel Project from GitHub
 
 1. **Clone the Repository:**
-   
-    `git clone https://github.com/xplodman/iBag`
+
+   ```bash
+   `git clone https://github.com/xplodman/iBag`
+   ```
+
 2. **Navigate to the Project Directory:**
 
-   `cd <project_directory>`
-   
+   ```bash
+   cd <project_directory>
+   ```
+
    Replace `<project_directory>` with the name of the directory where you cloned the repository.
 
 3. **Install Composer Dependencies:**
 
-   `composer install`
+   ```bash
+   composer install
+   ```
 
 4. **Copy the Environment File:**
 
-   `cp .env.example .env`
+   ```bash
+   cp .env.example .env
+   ```
 
 5. **Generate Application Key:**
 
-   `php artisan key:generate`
+   ```bash
+   php artisan key:generate
+   ```
 
 6. **Update Environment Variables:**
    Open the `.env` file and set the necessary environment variables like database connection details.
 
 7. **Run Migrations with Seeding:**
-   ```
+
+   ```bash
    php artisan migrate:fresh --seed
+   ```
    This will migrate the database and seed it with data.
 
 8. **Accessing the Application:**
    Once the migration is complete, you can access your Laravel application.
 
 9. **Log in with User Credentials:**
-   - **Email:** admin@ibag.localhost
-   - **Password:** P@ssw0rd
+    - **Email:** admin@ibag.localhost
+    - **Password:** P@ssw0rd
