@@ -14,16 +14,16 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        
+
 
         \DB::table('users')->delete();
-        
+
         \DB::table('users')->insert(array (
-            0 => 
+            0 =>
             array (
                 'id' => 1,
                 'name' => 'Admin',
-                'email' => 'admin@ibag.localhost',
+                'email' => 'admin@ibag.future-co.org',
                 'email_verified_at' => NULL,
                 'otp' => NULL,
                 'password' => '$2y$12$lAg5L1fTJe9xOaA1JyLKBOeqdcrH2rTwHRFZVC7/ynlwoj52vc8EK',
@@ -43,7 +43,7 @@ class UsersTableSeeder extends Seeder
                 'address' => NULL,
             ),
         ));
-        
-        
+
+
     }
 }
