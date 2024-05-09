@@ -15,16 +15,16 @@ class Category extends Model implements HasMedia
     use InteractsWithMedia;
 
     public static array $allowedFilters = [
-        'donation_category'
+        'category_donation'
     ];
 
     protected $fillable = [
         'name',
-        'donation_category',
+        'category_donation',
     ];
 
     protected $casts = [
-        'donation_category' => 'boolean',
+        'category_donation' => 'boolean',
     ];
 
     /**

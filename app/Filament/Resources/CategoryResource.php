@@ -28,7 +28,7 @@ class CategoryResource extends Resource
                     ->required()
                     ->maxLength(255)->columnSpanFull(),
                 SpatieMediaLibraryFileUpload::make('image')->columnSpanFull(),
-                Forms\Components\Toggle::make('donation_category')
+                Forms\Components\Toggle::make('category_donation')
                     ->required(),
             ]);
     }
@@ -39,7 +39,7 @@ class CategoryResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\IconColumn::make('donation_category')
+                Tables\Columns\IconColumn::make('category_donation')
                     ->boolean(),
                 Tables\Columns\SpatieMediaLibraryImageColumn::make('image')
                                                             ->toggleable(),

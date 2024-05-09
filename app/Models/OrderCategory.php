@@ -14,6 +14,6 @@ class OrderCategory extends Pivot
 
     public function category(): BelongsTo
     {
-        return $this->belongsTo(Category::class)->where('donation_category', false);
+        return $this->belongsTo(Category::class)->where('category_donation', false);
     }
 }
