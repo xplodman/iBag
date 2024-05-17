@@ -18,6 +18,7 @@ use App\Http\Controllers\UserAuthController;
 
 Route::post('register', [ UserAuthController::class, 'register' ]);
 Route::post('login', [ UserAuthController::class, 'login' ]);
+Route::post('login/verify', [ UserAuthController::class, 'verifyLogin' ]);
 
 Route::middleware([ 'auth:sanctum', 'verified'])->group(function () {
     Route::post('logout', [ UserAuthController::class, 'logout' ]);

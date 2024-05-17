@@ -12,23 +12,12 @@ class UserAuthController extends Controller
     public function register(Request $request)
     {
         $registerUserData = $request->validate([
-            'name'=>'required|string',
             'email'=>'required|string|email|unique:users',
-            'password'=>'required|min:8',
-            'profile_image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-
 
         $user = User::create([
-            'name' => $registerUserData['name'],
             'email' => $registerUserData['email'],
-            'password' => Hash::make($registerUserData['password']),
         ]);
-
-        // Handle profile photo upload
-        if ($request->hasFile('profile_image')) {
-            $user->addMedia($request->file('profile_image'))->toMediaCollection();
-        }
 
         $token = $user->createToken($user->name.'-AuthToken')->plainTextToken;
 
@@ -46,18 +35,50 @@ class UserAuthController extends Controller
     {
         $loginUserData = $request->validate([
             'email'=>'required|string|email',
-            'password'=>'required|min:8'
         ]);
         $user = User::where('email', $loginUserData['email'])->first();
-        if (!$user || !Hash::check($loginUserData['password'], $user->password)) {
+        if (!$user) {
             return response()->json([
                 'message' => 'Invalid Credentials'
             ], 401);
         }
-        $token = $user->createToken($user->name.'-AuthToken')->plainTextToken;
-        return response()->json([
-            'access_token' => $token,
+        $otp = random_int(100000, 999999);
+        $user->otp = $otp;
+        $user->save();
+        $user->notify(new VerifyEmail($otp));
+
+        return response()->json(['message' => 'Verification email sent successfully']);
+    }
+
+    public function verifyLogin(Request $request)
+    {
+        $loginUserData = $request->validate([
+            'email'=>'required|string|email',
         ]);
+        $user = User::where('email', $loginUserData['email'])->first();
+        if (!$user) {
+            return response()->json([
+                'message' => 'Invalid Credentials'
+            ], 401);
+        }
+
+        if ($request->otp === $user->otp) {
+            $user->otp = null; // Clear OTP after verification
+
+            if (empty($user->email_verified_at)) {
+                $user->email_verified_at = now();
+            }
+            $user->save();
+
+            $token = $user->createToken($user->name.'-AuthToken')->plainTextToken;
+            return response()->json([
+                'access_token' => $token,
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Invalid OTP'
+        ], 401);
     }
 
     public function logout()
