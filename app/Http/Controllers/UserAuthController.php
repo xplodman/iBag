@@ -42,6 +42,20 @@ class UserAuthController extends Controller
                 'message' => 'Invalid Credentials'
             ], 401);
         }
+
+        if ($user->is_provider) {
+            if (! Hash::check($request->password, $user->password)) {
+                return response()->json([
+                    'message' => 'Invalid Credentials',
+                ], 401);
+            }
+
+            $token = $user->createToken($user->name.'-AuthToken')->plainTextToken;
+            return response()->json([
+                'access_token' => $token,
+            ]);
+        }
+
         $otp = random_int(100000, 999999);
         $user->otp = $otp;
         $user->save();

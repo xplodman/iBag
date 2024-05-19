@@ -37,7 +37,7 @@ class UserResource extends Resource
                        ->description()
                        ->schema([
                            TextInput::make('name'),
-                           TextInput::make('email')->email(),
+                           TextInput::make('email')->email()->unique(ignoreRecord: true),
                            TextInput::make('mobile'),
                            TextInput::make('address'),
                            TextInput::make('password')
