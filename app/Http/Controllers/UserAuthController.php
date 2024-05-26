@@ -116,6 +116,8 @@ class UserAuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'mobile' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
         $user = auth()->user();
@@ -126,12 +128,17 @@ class UserAuthController extends Controller
             $user->addMedia($request->file('profile_image'))->toMediaCollection();
         }
 
+        // Update user details
         $user->name = $request->input('name');
+
+        // Check if mobile and address are provided, if not, set them to null
+        $user->mobile = $request->filled('mobile') ? $request->input('mobile') : null;
+        $user->address = $request->filled('address') ? $request->input('address') : null;
         $user->save();
 
         return response()->json([
             'message' => 'User updated successfully',
-            'user' => $user
+            'user' => $user->fresh()
         ]);
     }
 

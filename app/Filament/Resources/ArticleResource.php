@@ -77,7 +77,6 @@ class ArticleResource extends Resource
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
-                Tables\Filters\SelectFilter::make('user')->relationship('user', 'name'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
