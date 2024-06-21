@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -21,7 +22,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Traits\HasRoles;
 use Filament\Models\Contracts\FilamentUser;
 
-class User extends Authenticatable implements FilamentUser, MustVerifyEmail, HasMedia
+class User extends Authenticatable implements FilamentUser, MustVerifyEmail, HasMedia, HasName
 {
     use InteractsWithMedia;
     use HasApiTokens;
@@ -38,7 +39,8 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
         'password',
         'profile_photo_path',
@@ -77,6 +79,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
      * @var array<int, string>
      */
     protected $appends = [
+        'name',
         'profile_photo_url',
         'profile_image',
         'total_orders_points',
@@ -124,5 +127,25 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
                 return $order->orderCategories->sum('estimated_kg');
             });
         });
+    }
+
+    public function getNameAttribute()
+    {
+        $firstName = $this->first_name ?? '';
+        $lastName = $this->last_name ?? '';
+
+        $fullName = trim($firstName . ' ' . $lastName);
+
+        return $fullName ?: $this->id;
+    }
+
+    public function getFilamentName(): string
+    {
+        $firstName = $this->first_name ?? '';
+        $lastName = $this->last_name ?? '';
+
+        $fullName = trim($firstName . ' ' . $lastName);
+
+        return $fullName ?: $this->id;
     }
 }

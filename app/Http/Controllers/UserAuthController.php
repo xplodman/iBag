@@ -12,14 +12,22 @@ class UserAuthController extends Controller
     public function register(Request $request)
     {
         $registerUserData = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'mobile' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
             'email'=>'required|string|email|unique:users',
         ]);
 
         $user = User::create([
+            'first_name' => $registerUserData['first_name'],
+            'last_name' => $registerUserData['last_name'],
+            'mobile' => $registerUserData['mobile'],
+            'address' => $registerUserData['address'],
             'email' => $registerUserData['email'],
         ]);
 
-        $token = $user->createToken($user->name.'-AuthToken')->plainTextToken;
+        $token = $user->createToken($user->email.'-AuthToken')->plainTextToken;
 
         $otp = random_int(100000, 999999);
         $user->otp = $otp;
@@ -33,63 +41,94 @@ class UserAuthController extends Controller
 
     public function login(Request $request)
     {
+        // Validate the incoming request data to ensure the 'email' field is provided, is a string, and is in a valid email format.
         $loginUserData = $request->validate([
-            'email'=>'required|string|email',
+            'email' => 'required|string|email',
         ]);
+
+        // Attempt to retrieve the user by email from the database.
         $user = User::where('email', $loginUserData['email'])->first();
+
+        // If no user is found with the provided email, return a 401 Unauthorized response with an error message.
         if (!$user) {
             return response()->json([
                 'message' => 'Invalid Credentials'
             ], 401);
         }
 
+        // Check if the user is a provider.
         if ($user->is_provider) {
-            if (! Hash::check($request->password, $user->password)) {
+            // Verify the provided password against the stored hash.
+            if (!Hash::check($request->password, $user->password)) {
+                // If the password check fails, return a 401 Unauthorized response with an error message.
                 return response()->json([
                     'message' => 'Invalid Credentials',
                 ], 401);
             }
 
-            $token = $user->createToken($user->name.'-AuthToken')->plainTextToken;
+            // Create an authentication token for the user.
+            $token = $user->createToken($user->email . '-AuthToken')->plainTextToken;
+
+            // Return the authentication token in the response.
             return response()->json([
                 'access_token' => $token,
             ]);
         }
 
+        // If the user is not a provider, generate a one-time password (OTP) for email verification.
         $otp = random_int(100000, 999999);
+
+        // Save the OTP to the user's record in the database.
         $user->otp = $otp;
         $user->save();
+
+        // Send a notification to the user with the OTP for email verification.
         $user->notify(new VerifyEmail($otp));
 
+        // Return a response indicating that the verification email was sent successfully.
         return response()->json(['message' => 'Verification email sent successfully']);
     }
 
     public function verifyLogin(Request $request)
     {
+        // Validate the incoming request data to ensure the 'email' field is provided, is a string, and is in a valid email format.
         $loginUserData = $request->validate([
-            'email'=>'required|string|email',
+            'email' => 'required|string|email',
         ]);
+
+        // Attempt to retrieve the user by email from the database.
         $user = User::where('email', $loginUserData['email'])->first();
+
+        // If no user is found with the provided email, return a 401 Unauthorized response with an error message.
         if (!$user) {
             return response()->json([
                 'message' => 'Invalid Credentials'
             ], 401);
         }
 
+        // Check if the provided OTP matches the one stored for the user.
         if ($request->otp === $user->otp) {
-            $user->otp = null; // Clear OTP after verification
+            // Clear the OTP after successful verification.
+            $user->otp = null;
 
+            // If the user's email has not been verified yet, set the email_verified_at timestamp to the current time.
             if (empty($user->email_verified_at)) {
                 $user->email_verified_at = now();
             }
+
+            // Save the user's updated information to the database.
             $user->save();
 
-            $token = $user->createToken($user->name.'-AuthToken')->plainTextToken;
+            // Create an authentication token for the user.
+            $token = $user->createToken($user->email . '-AuthToken')->plainTextToken;
+
+            // Return the authentication token in the response.
             return response()->json([
                 'access_token' => $token,
             ]);
         }
 
+        // If the provided OTP does not match, return a 401 Unauthorized response with an error message.
         return response()->json([
             'message' => 'Invalid OTP'
         ], 401);
@@ -115,7 +154,8 @@ class UserAuthController extends Controller
     public function updateUser(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'mobile' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -129,9 +169,8 @@ class UserAuthController extends Controller
         }
 
         // Update user details
-        $user->name = $request->input('name');
-
-        // Check if mobile and address are provided, if not, set them to null
+        $user->first_name = $request->input('first_name');
+        $user->last_name = $request->input('last_name');
         $user->mobile = $request->filled('mobile') ? $request->input('mobile') : null;
         $user->address = $request->filled('address') ? $request->input('address') : null;
         $user->save();

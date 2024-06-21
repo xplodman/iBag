@@ -36,7 +36,8 @@ class UserResource extends Resource
                 Section::make()
                        ->description()
                        ->schema([
-                           TextInput::make('name'),
+                           TextInput::make('first_name'),
+                           TextInput::make('last_name'),
                            TextInput::make('email')->email()->unique(ignoreRecord: true),
                            TextInput::make('mobile'),
                            TextInput::make('address'),
@@ -62,7 +63,8 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
+                TextColumn::make('first_name'),
+                TextColumn::make('last_name'),
                 TextColumn::make('email'),
                 TextColumn::make('mobile'),
                 TextColumn::make('address'),
