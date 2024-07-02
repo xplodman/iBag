@@ -158,13 +158,13 @@ class UserAuthController extends Controller
             'last_name' => 'required|string|max:255',
             'mobile' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
-            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
         $user = auth()->user();
 
+        $user->clearMediaCollection();
         // Handle profile photo upload
         if ($request->hasFile('profile_image')) {
-            $user->clearMediaCollection();
             $user->addMedia($request->file('profile_image'))->toMediaCollection();
         }
 

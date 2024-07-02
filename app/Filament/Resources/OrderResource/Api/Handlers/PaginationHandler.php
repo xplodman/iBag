@@ -6,13 +6,14 @@ use Rupadana\ApiService\Http\Handlers;
 use Spatie\QueryBuilder\QueryBuilder;
 use App\Filament\Resources\OrderResource;
 
-class PaginationHandler extends Handlers {
+class PaginationHandler extends Handlers
+{
     public static string | null $uri = '/';
     public static string | null $resource = OrderResource::class;
 
     public function handler()
     {
-        $query = static::getEloquentQuery();
+        $query = static::getEloquentQuery()->with(['user', 'orderCategories', 'orderCategories.category']);
         $model = static::getModel();
 
         $query = QueryBuilder::for($query)
@@ -26,7 +27,7 @@ class PaginationHandler extends Handlers {
         }
 
         $query = $query->paginate(request()->query('per_page'))
-        ->appends(request()->query());
+                       ->appends(request()->query());
 
         return static::getApiTransformer()::collection($query);
     }
