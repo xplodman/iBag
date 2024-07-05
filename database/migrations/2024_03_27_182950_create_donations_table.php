@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('donations', function (Blueprint $table) {
             $table->id();
             $table->string('address');
-            $table->string('location');
+            $table->string('location')->nullable();
             $table->date('date');
             $table->string('interval');
             $table->boolean('remind_me')->default(false);

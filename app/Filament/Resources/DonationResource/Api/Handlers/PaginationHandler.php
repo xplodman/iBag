@@ -12,7 +12,7 @@ class PaginationHandler extends Handlers {
 
     public function handler()
     {
-        $query = static::getEloquentQuery();
+        $query = static::getEloquentQuery()->with(['user', 'donationCategories', 'donationCategories.category']);
         $model = static::getModel();
 
         $query = QueryBuilder::for($query)

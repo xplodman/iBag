@@ -26,6 +26,15 @@ class Donation extends Model
         'remind_me' => 'boolean'
     ];
 
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'total_estimated_kg',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -34,5 +43,13 @@ class Donation extends Model
     public function donationCategories(): HasMany
     {
         return $this->hasMany(DonationCategory::class);
+    }
+
+    /**
+     * Get the total estimated KGs for each donationCategories.
+     */
+    protected function getTotalEstimatedKgAttribute()
+    {
+        return $this->donationCategories->sum('estimated_kg');
     }
 }

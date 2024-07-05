@@ -12,8 +12,8 @@ class UserAuthController extends Controller
     public function register(Request $request)
     {
         $registerUserData = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'first_name' => 'nullable|string|max:255',
+            'last_name' => 'nullable|string|max:255',
             'mobile' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
             'email'=>'required|string|email|unique:users',
@@ -154,8 +154,8 @@ class UserAuthController extends Controller
     public function updateUser(Request $request)
     {
         $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'first_name' => 'nullable|string|max:255',
+            'last_name' => 'nullable|string|max:255',
             'mobile' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',

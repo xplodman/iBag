@@ -18,7 +18,7 @@ class DetailHandler extends Handlers
     {
         $id = $request->route('id');
 
-        $query = static::getEloquentQuery();
+        $query = static::getEloquentQuery()->with(['user', 'donationCategories', 'donationCategories.category']);
 
         $query = QueryBuilder::for(
             $query->where(static::getKeyName(), $id)
