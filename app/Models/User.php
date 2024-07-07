@@ -148,4 +148,9 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
 
         return $fullName ?: $this->id;
     }
+
+    public function bin()
+    {
+        return $this->hasOne(Bin::class);
+    }
 }

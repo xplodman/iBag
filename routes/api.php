@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BinReadingController;
 use App\Http\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Support\Facades\Route;
@@ -24,7 +25,11 @@ Route::middleware([ 'auth:sanctum', 'verified'])->group(function () {
     Route::post('logout', [ UserAuthController::class, 'logout' ]);
     Route::get('user', [ UserAuthController::class, 'getUser' ]);
     Route::put('user', [ UserAuthController::class, 'updateUser' ]);
+
+    Route::get('/bin-readings/list', [BinReadingController::class, 'list']);
+    Route::get('/bin-readings/show-last-read', [BinReadingController::class, 'show']);
 });
 
 Route::post('email/verify', [ UserAuthController::class, 'verifyEmail' ])->name('email.verify');
 Route::post('email/resend', [ UserAuthController::class, 'resendVerificationEmail' ])->name('email.resend');
+Route::post('/bin-readings/store', [BinReadingController::class, 'store']);
